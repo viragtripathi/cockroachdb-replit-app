@@ -36,6 +36,14 @@ npm run dev
 
 The example URL is only for an insecure local cluster. A CockroachDB Cloud URL must retain its TLS settings, normally `sslmode=verify-full`.
 
+If another application already owns port `3000`, choose a free port when starting this app:
+
+```bash
+PORT=3001 npm run dev
+```
+
+Use that same port in the requests below—for example, `http://127.0.0.1:3001`.
+
 Create a seat and reserve it:
 
 ```bash
