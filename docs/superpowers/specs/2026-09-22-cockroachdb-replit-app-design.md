@@ -1,12 +1,12 @@
-# Replit CockroachDB POC design
+# CockroachDB Replit App design
 
 ## Purpose
 
-Build a small TypeScript application that can be imported into Replit and used to prove the application-runtime half of a CockroachDB integration. The POC must also document how to connect Replit Agent to the existing managed MCP endpoint at `https://cockroachlabs.cloud/mcp` without storing MCP or SQL credentials in Git.
+Build a TypeScript integration reference app that can be imported into Replit and used to prove the application-runtime half of a CockroachDB integration. The app must also document how to connect Replit Agent to the existing managed MCP endpoint at `https://cockroachlabs.cloud/mcp` without storing MCP or SQL credentials in Git.
 
 ## Success criteria
 
-The POC is successful when:
+The reference app is successful when:
 
 1. A developer can import the repository into Replit, add `DATABASE_URL` through Replit Secrets, and run the application.
 2. The application uses the normal PostgreSQL wire protocol through `pg`.

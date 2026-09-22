@@ -1,0 +1,58 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  quality:
+    name: Unit, typecheck, and build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run check:secrets
+      - run: npm run test:unit
+      - run: npm run typecheck
+      - run: npm run build
+
+  cockroachdb:
+    name: CockroachDB integration and E2E
+    runs-on: ubuntu-latest
+    needs: quality
+    env:
+      DATABASE_URL: postgresql://root@127.0.0.1:26257/defaultdb?sslmode=disable
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Start CockroachDB
+        run: |
+          docker run --detach --name cockroachdb --publish 26257:26257 \
+            cockroachdb/cockroach:v26.2.6 \
+            start-single-node --insecure --listen-addr=0.0.0.0:26257
+          for attempt in {1..30}; do
+            if docker exec cockroachdb cockroach sql --insecure --execute 'SELECT 1'; then
+              exit 0
+            fi
+            sleep 1
+          done
+          docker logs cockroachdb
+          exit 1
+      - run: npm run migrate
+      - run: npm run test:integration
+      - run: npm run test:e2e
+      - name: Stop CockroachDB
+        if: always()
+        run: docker rm --force cockroachdb

@@ -18,7 +18,7 @@ const environmentSchema = z.object({
   APPLICATION_NAME: z
     .string()
     .min(1, "APPLICATION_NAME must not be empty")
-    .default("replit-cockroachdb-poc"),
+    .default("cockroachdb-replit-app"),
   DB_CONNECTION_TIMEOUT_MS: z.coerce
     .number()
     .int("DB_CONNECTION_TIMEOUT_MS must be an integer")

@@ -1,5 +1,5 @@
 {
-  "name": "replit-cockroachdb-poc",
+  "name": "cockroachdb-replit-app",
   "version": "0.1.0",
   "private": true,
   "type": "module",
@@ -8,13 +8,16 @@
   },
   "scripts": {
     "dev": "tsx watch src/server.ts",
-    "build": "tsc -p tsconfig.json",
+    "clean": "node scripts/clean.mjs",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "start": "node dist/src/server.js",
     "test": "vitest run",
-    "test:unit": "vitest run --exclude tests/integration/**",
+    "test:unit": "vitest run --exclude tests/integration/** --exclude tests/e2e/**",
     "test:integration": "vitest run tests/integration/database.test.ts",
+    "test:e2e": "npm run build && RUN_E2E=true vitest run tests/e2e/api.test.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "migrate": "tsx scripts/migrate.ts"
+    "migrate": "tsx scripts/migrate.ts",
+    "check:secrets": "bash scripts/check-secrets.sh"
   },
   "dependencies": {
     "express": "5.2.1",

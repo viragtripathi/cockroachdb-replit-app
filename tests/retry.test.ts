@@ -184,6 +184,28 @@ describe("executeTx", () => {
     expect(sleep).toHaveBeenCalledOnce();
   });
 
+  test("releases the failed attempt before waiting to retry", async () => {
+    const pool = new ScriptedPool();
+    let operationCalls = 0;
+    const releasedDuringSleep: boolean[] = [];
+
+    await executeTx(
+      pool,
+      async () => {
+        operationCalls += 1;
+        if (operationCalls === 1) throw databaseError("40001");
+        return "done";
+      },
+      {
+        sleep: async () => {
+          releasedDuringSleep.push(pool.clients[0]?.released ?? false);
+        },
+      },
+    );
+
+    expect(releasedDuringSleep).toEqual([true]);
+  });
+
   test("preserves the original error when rollback also fails", async () => {
     const original = databaseError("23505", "duplicate key");
     const pool = new ScriptedPool(() => new ScriptedClient(undefined, new Error("rollback failed")));

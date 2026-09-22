@@ -121,7 +121,7 @@ describe("HTTP API", () => {
 
   test("sanitizes unexpected errors", async () => {
     vi.mocked(service.createSeat).mockRejectedValue(
-      new Error("postgresql://user:password@private-host/database"),
+      new Error("sensitive driver details for private-host"),
     );
 
     const response = await request(createApp({ service, healthCheck }))
@@ -130,7 +130,7 @@ describe("HTTP API", () => {
 
     expect(response.status).toBe(500);
     expect(response.body).toEqual({ error: "internal_error" });
-    expect(response.text).not.toContain("password");
+    expect(response.text).not.toContain("sensitive driver details");
     expect(response.text).not.toContain("private-host");
   });
 });

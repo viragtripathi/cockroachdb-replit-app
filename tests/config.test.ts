@@ -13,7 +13,7 @@ describe("loadConfig", () => {
     expect(config.port).toBe(3000);
     expect(config.poolMax).toBe(5);
     expect(config.host).toBe("0.0.0.0");
-    expect(config.applicationName).toBe("replit-cockroachdb-poc");
+    expect(config.applicationName).toBe("cockroachdb-replit-app");
     expect(config.connectionTimeoutMs).toBe(5_000);
     expect(config.idleTimeoutMs).toBe(30_000);
     expect(config.retry).toEqual({
@@ -30,7 +30,7 @@ describe("loadConfig", () => {
       PORT: "8080",
       DB_POOL_MAX: "9",
       HOST: "127.0.0.1",
-      APPLICATION_NAME: "configured-poc",
+      APPLICATION_NAME: "configured-app",
       DB_CONNECTION_TIMEOUT_MS: "6000",
       DB_IDLE_TIMEOUT_MS: "45000",
       TX_MAX_ATTEMPTS: "7",
@@ -42,7 +42,7 @@ describe("loadConfig", () => {
     expect(config.port).toBe(8080);
     expect(config.poolMax).toBe(9);
     expect(config.host).toBe("127.0.0.1");
-    expect(config.applicationName).toBe("configured-poc");
+    expect(config.applicationName).toBe("configured-app");
     expect(config.connectionTimeoutMs).toBe(6_000);
     expect(config.idleTimeoutMs).toBe(45_000);
     expect(config.retry).toEqual({

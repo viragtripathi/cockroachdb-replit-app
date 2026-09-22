@@ -24,15 +24,15 @@ const defaultSleep = (delayMs: number, signal?: AbortSignal): Promise<void> =>
       return;
     }
 
-    const timer = setTimeout(resolve, delayMs);
-    signal?.addEventListener(
-      "abort",
-      () => {
-        clearTimeout(timer);
-        reject(abortError());
-      },
-      { once: true },
-    );
+    const onAbort = (): void => {
+      clearTimeout(timer);
+      reject(abortError());
+    };
+    const timer = setTimeout(() => {
+      signal?.removeEventListener("abort", onAbort);
+      resolve();
+    }, delayMs);
+    signal?.addEventListener("abort", onAbort, { once: true });
   });
 
 function requirePositiveInteger(value: number, name: string): void {
@@ -75,8 +75,10 @@ export async function executeTx<Result>(
     throwIfAborted(options.signal);
     const client = await pool.connect();
     let began = false;
+    let retryDelayMs: number | undefined;
 
     try {
+      throwIfAborted(options.signal);
       await client.query("BEGIN");
       began = true;
       const result = await operation(client);
@@ -99,10 +101,14 @@ export async function executeTx<Result>(
       const ceiling = Math.min(maxDelayMs, baseDelayMs * 2 ** (attempt - 1));
       const delayMs = Math.floor(ceiling * random());
       options.onRetry?.({ attempt, delayMs, code });
-      await sleep(delayMs, options.signal);
-      throwIfAborted(options.signal);
+      retryDelayMs = delayMs;
     } finally {
       client.release();
+    }
+
+    if (retryDelayMs !== undefined) {
+      await sleep(retryDelayMs, options.signal);
+      throwIfAborted(options.signal);
     }
   }
 

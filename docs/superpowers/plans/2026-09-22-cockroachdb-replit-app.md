@@ -1,4 +1,4 @@
-# Replit CockroachDB POC Implementation Plan
+# CockroachDB Replit App Implementation Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -8,7 +8,7 @@
 
 **Tech Stack:** Node.js 22+, TypeScript 7.0.2, Express 5.2.1, node-postgres 8.23.0, Zod 4.6.5, Vitest 5.0.1, tsx 4.23.15.
 
-**Spec:** `docs/superpowers/specs/2026-09-22-replit-cockroachdb-poc-design.md`
+**Spec:** `docs/superpowers/specs/2026-09-22-cockroachdb-replit-app-design.md`
 
 ## Global constraints
 
@@ -19,7 +19,7 @@
 - Keep external side effects outside retryable callbacks.
 - Use a process-wide pool with a default maximum of five connections.
 - Make live database tests optional when `DATABASE_URL` is absent.
-- Keep the POC small enough to import and run directly in Replit.
+- Keep the reference app small enough to import and run directly in Replit.
 
 ---
 
@@ -76,7 +76,7 @@ Expected: all configuration tests pass and TypeScript reports no errors.
 
 ```bash
 git add package.json package-lock.json tsconfig.json .gitignore .env.example .replit src/config.ts tests/config.test.ts
-git commit -m "chore: scaffold Replit CockroachDB POC"
+git commit -m "chore: scaffold CockroachDB Replit app"
 ```
 
 ### Task 2: Retry-safe transaction executor
@@ -193,7 +193,7 @@ Use UUID primary keys and timestamp columns. The reservation operation ID is the
 
 - [ ] **Step 4: Implement the pool and migration runner**
 
-Create one `Pool` with `max: config.poolMax`, a five-second connection timeout, a thirty-second idle timeout, and `application_name=replit-cockroachdb-poc`. The migration runner reads `migrations/001_init.sql`, executes it through the pool, and always closes the pool.
+Create one `Pool` with configurable limits, timeouts, and application name. The migration runner reads `migrations/001_init.sql`, executes it through the pool, and always closes the pool.
 
 - [ ] **Step 5: Implement the reservation service**
 
@@ -317,7 +317,7 @@ Expected: only intended source files are uncommitted and the secret scan returns
 
 ```bash
 git add README.md replit.md docs/setup.md docs/findings.md tests/integration/database.test.ts
-git commit -m "docs: add Replit setup and POC verification"
+git commit -m "docs: add Replit app setup and verification"
 ```
 
 ### Task 6: Final review and handoff
@@ -327,11 +327,11 @@ git commit -m "docs: add Replit setup and POC verification"
 
 **Interfaces:**
 - Consumes: the complete repository
-- Produces: a clean commit history and verified importable POC
+- Produces: a clean commit history and verified importable reference app
 
 - [ ] **Step 1: Review the implementation against the design**
 
-Check every success criterion in `docs/superpowers/specs/2026-09-22-replit-cockroachdb-poc-design.md` and record any unavailable live checks in `docs/findings.md`.
+Check every success criterion in `docs/superpowers/specs/2026-09-22-cockroachdb-replit-app-design.md` and record any unavailable live checks in `docs/findings.md`.
 
 - [ ] **Step 2: Run the complete verification command**
 
