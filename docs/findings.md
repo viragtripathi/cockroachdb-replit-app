@@ -14,7 +14,7 @@ This file separates verified behavior from work that needs Cockroach Cloud or Re
 | Configuration | Pass | All deployment-specific values are environment-backed and validated |
 | Built process | Pass | E2E starts `dist/src/server.js` and drives HTTP |
 | Secret hygiene | Pass locally | Automated pattern check and ignored environment files |
-| Cloud SQL | Pending | Run the same migration/integration/E2E commands with a rotated test credential |
+| Cloud SQL | Pass (2026-09-22) | TLS verified against Cloud v26.2.6; migration, integration, real `40001`, and E2E passed; zero test-prefixed rows remained |
 | Replit deployment | Pending | Import, Secret, migration, Run, deployment smoke test |
 
 ## Managed MCP live test
