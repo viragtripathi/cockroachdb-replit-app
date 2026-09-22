@@ -14,13 +14,54 @@ const environmentSchema = z.object({
     .min(1, "DB_POOL_MAX must be at least 1")
     .max(50, "DB_POOL_MAX must be at most 50")
     .default(5),
+  HOST: z.string().min(1, "HOST must not be empty").default("0.0.0.0"),
+  APPLICATION_NAME: z
+    .string()
+    .min(1, "APPLICATION_NAME must not be empty")
+    .default("replit-cockroachdb-poc"),
+  DB_CONNECTION_TIMEOUT_MS: z.coerce
+    .number()
+    .int("DB_CONNECTION_TIMEOUT_MS must be an integer")
+    .min(1, "DB_CONNECTION_TIMEOUT_MS must be at least 1")
+    .default(5_000),
+  DB_IDLE_TIMEOUT_MS: z.coerce
+    .number()
+    .int("DB_IDLE_TIMEOUT_MS must be an integer")
+    .min(1, "DB_IDLE_TIMEOUT_MS must be at least 1")
+    .default(30_000),
+  TX_MAX_ATTEMPTS: z.coerce
+    .number()
+    .int("TX_MAX_ATTEMPTS must be an integer")
+    .min(1, "TX_MAX_ATTEMPTS must be at least 1")
+    .default(5),
+  TX_BASE_DELAY_MS: z.coerce
+    .number()
+    .int("TX_BASE_DELAY_MS must be an integer")
+    .min(1, "TX_BASE_DELAY_MS must be at least 1")
+    .default(20),
+  TX_MAX_DELAY_MS: z.coerce
+    .number()
+    .int("TX_MAX_DELAY_MS must be an integer")
+    .min(1, "TX_MAX_DELAY_MS must be at least 1")
+    .default(1_000),
   NODE_ENV: z.enum(["development", "test", "production"]).default("development"),
 });
+
+export interface RetryConfig {
+  readonly maxAttempts: number;
+  readonly baseDelayMs: number;
+  readonly maxDelayMs: number;
+}
 
 export interface AppConfig {
   readonly databaseUrl: string;
   readonly port: number;
   readonly poolMax: number;
+  readonly host: string;
+  readonly applicationName: string;
+  readonly connectionTimeoutMs: number;
+  readonly idleTimeoutMs: number;
+  readonly retry: RetryConfig;
   readonly nodeEnv: "development" | "test" | "production";
 }
 
@@ -31,6 +72,15 @@ export function loadConfig(env: NodeJS.ProcessEnv = process.env): AppConfig {
     databaseUrl: parsed.DATABASE_URL,
     port: parsed.PORT,
     poolMax: parsed.DB_POOL_MAX,
+    host: parsed.HOST,
+    applicationName: parsed.APPLICATION_NAME,
+    connectionTimeoutMs: parsed.DB_CONNECTION_TIMEOUT_MS,
+    idleTimeoutMs: parsed.DB_IDLE_TIMEOUT_MS,
+    retry: Object.freeze({
+      maxAttempts: parsed.TX_MAX_ATTEMPTS,
+      baseDelayMs: parsed.TX_BASE_DELAY_MS,
+      maxDelayMs: parsed.TX_MAX_DELAY_MS,
+    }),
     nodeEnv: parsed.NODE_ENV,
   });
 }
