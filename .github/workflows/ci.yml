@@ -39,9 +39,9 @@ jobs:
       - run: npm ci
       - name: Start CockroachDB
         run: |
-          docker run --detach --name cockroachdb --publish 26257:26257 \
+          docker run --detach --name cockroachdb --network host \
             cockroachdb/cockroach:v26.2.6 \
-            start-single-node --insecure --listen-addr=0.0.0.0:26257
+            start-single-node --insecure --listen-addr=127.0.0.1:26257
           for attempt in {1..30}; do
             if docker exec cockroachdb cockroach sql --insecure --execute 'SELECT 1'; then
               exit 0
